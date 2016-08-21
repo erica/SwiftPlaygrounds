@@ -149,11 +149,7 @@ extension View {
         h: Bool = true, v: Bool = true,
         inset: Int = 0)
     {
-        #if os(OSX)
-            guard let _ = superview else { self.print("no superview") ; return }
-        #else
-            guard let _ = superview else { print("no superview") ; return }
-        #endif
+        guard let _ = superview else { Swift.print("no superview") ; return }
         translatesAutoresizingMaskIntoConstraints = false
         if h { constrainView(priority: priority, "H:|-(\(inset))-[view]-(\(inset))-|", view: self) }
         if v { constrainView(priority: priority, "V:|-(\(inset))-[view]-(\(inset))-|", view: self) }
@@ -165,11 +161,7 @@ extension View {
     public func centerInSuperview(
         priority: LayoutPriority = 1000,
         h: Bool = true, v: Bool = true) {
-        #if os(OSX)
-            guard let superview = superview else { self.print("no superview") ; return }
-        #else
-            guard let superview = superview else { print("no superview") ; return }
-        #endif
+        guard let superview = superview else { Swift.print("no superview") ; return }
         translatesAutoresizingMaskIntoConstraints = false
         if h { centerXAnchor.constraint(
             equalTo: superview.centerXAnchor)
@@ -236,11 +228,7 @@ extension View {
         priority: LayoutPriority = 1000,
         position: CGPoint)
     {
-        #if os(OSX)
-            guard let superview = superview else { self.print("no superview") ; return }
-        #else
-            guard let superview = superview else { print("no superview") ; return }
-        #endif
+        guard let superview = superview else { Swift.print("no superview") ; return }
         if position.x != skipConstraint {
             leftAnchor.constraint(
                 greaterThanOrEqualTo: superview.leftAnchor, constant: position.x)
