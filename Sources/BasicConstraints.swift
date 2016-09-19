@@ -17,6 +17,8 @@
     public typealias LayoutPriority = UILayoutPriority
 #endif
 
+public typealias LayoutAttribute = NSLayoutAttribute
+
 public let defaultLayoutOptions: NSLayoutFormatOptions = []
 public let skipConstraint = CGRect.null.origin.x
 
@@ -111,57 +113,67 @@ public extension View {
     }
 }
 
-/// Constrain a group of views
-/// - parameter priority: layout priority between 1 and 1000
-/// - parameter format: visual layout format string
-/// - parameter views: in order from view1 to viewN
-public func constrainViews(
-    priority: LayoutPriority = 1000,
-    _ format: String, views: View...)
-{
-    guard !views.isEmpty else { return }
-    var bindings: [String: View] = ["view": views.first!]
-    for (count, view) in views.enumerated() {
-        bindings["view"+String(count + 1)] = view
-        view.translatesAutoresizingMaskIntoConstraints = false
+public extension View {
+    /// Constrain a group of views
+    /// - parameter format: visual layout format string
+    /// - parameter views: in order from view1 to viewN
+    /// - parameter priority: layout priority between 1 and 1000
+    public static func constrain(
+        _ format: String,
+        _ views: View...,
+        priority: LayoutPriority = 1000)
+    {
+        guard !views.isEmpty else { return }
+        var bindings: [String: View] = ["view": views.first!]
+        for (count, view) in views.enumerated() {
+            bindings["view" + String(describing: count + 1)] = view
+            view.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        let constraints = NSLayoutConstraint.constraints(
+            withVisualFormat: format, options: [],
+            metrics: nil, views: bindings)
+        constraints.forEach { $0.activate(priority: priority) }
+        NSLayoutConstraint.activate(constraints)
     }
     
-    let constraints = NSLayoutConstraint.constraints(
-        withVisualFormat: format, options: [],
-        metrics: nil, views: bindings)
-    constraints.forEach { $0.activate(priority: priority) }
-    NSLayoutConstraint.activate(constraints)
-}
-
-/// Constrain a single view
-public func constrainView(
-    priority: LayoutPriority = 1000,
-    _ format: String, view: View) {
-    constrainViews(priority: priority, format, views: view)
+    /// Align a pair of views using a layout attribute
+    public static func alignViews(_ view1: View, _ view2: View, attribute: LayoutAttribute, priority: LayoutPriority = 1000) {
+        let constraint = NSLayoutConstraint(item: view1, attribute: attribute, relatedBy: .equal, toItem: view2, attribute: attribute, multiplier: 1.0, constant: 0.0)
+        constraint.activate(priority: priority)
+    }
 }
 
 extension View {
+    /// Constrain this view
+    public func constrain(_ format: String, priority: LayoutPriority = 1000) {
+        View.constrain(format, self, priority: priority)
+    }
+    
     /// Stretch view to superview
     /// - parameter h: should stretch horizontally
     /// - parameter v: should stretch vertically
     public func stretchToSuperview(
-        priority: LayoutPriority = 1000,
         h: Bool = true, v: Bool = true,
-        inset: Int = 0)
+        inset: Int = 0,
+        priority: LayoutPriority = 1000)
     {
-        guard let _ = superview else { Swift.print("no superview") ; return }
+        guard let _ = superview
+            else { Swift.print("no superview") ; return }
         translatesAutoresizingMaskIntoConstraints = false
-        if h { constrainView(priority: priority, "H:|-(\(inset))-[view]-(\(inset))-|", view: self) }
-        if v { constrainView(priority: priority, "V:|-(\(inset))-[view]-(\(inset))-|", view: self) }
+        if h { self.constrain("H:|-(\(inset))-[view]-(\(inset))-|", priority: priority) }
+        if v { self.constrain("V:|-(\(inset))-[view]-(\(inset))-|", priority: priority) }
     }
     
     /// Center view in superview
     /// - parameter h: should center horizontally
     /// - parameter v: should center vertically
     public func centerInSuperview(
-        priority: LayoutPriority = 1000,
-        h: Bool = true, v: Bool = true) {
-        guard let superview = superview else { Swift.print("no superview") ; return }
+        h: Bool = true, v: Bool = true,
+        priority: LayoutPriority = 1000)
+    {
+        guard let superview = superview
+            else { Swift.print("no superview") ; return }
         translatesAutoresizingMaskIntoConstraints = false
         if h { centerXAnchor.constraint(
             equalTo: superview.centerXAnchor)
@@ -175,9 +187,9 @@ extension View {
     
     /// Set size constraint
     /// - Note: Set size's width or height to skipConstraint to skip
-    public func constrainSize(
-        priority: LayoutPriority = 1000,
-        size: CGSize)
+    public func constrain(
+        size: CGSize,
+        priority: LayoutPriority = 1000)
     {
         if size.width != skipConstraint {
             widthAnchor.constraint(equalToConstant: size.width)
@@ -189,12 +201,20 @@ extension View {
         }
     }
     
+    /// Alternative size constraint
+    /// - Note: Set size's width or height to skipConstraint to skip
+    public func constrain(
+        width: CGFloat, height: CGFloat,
+        priority: LayoutPriority = 1000)
+    {
+        self.constrain(size: CGSize(width: width, height: height), priority: priority)
+    }
+    
     /// Set minimum size constraint
     /// - Note: Set size's width or height to skipConstraint to skip
-    public func constrainMinimumSize(
-        priority: LayoutPriority = 1000,
-        size: CGSize
-        )
+    public func constrain(
+        minimumSize size: CGSize,
+        priority: LayoutPriority = 1000)
     {
         if size.width != skipConstraint {
             widthAnchor.constraint(greaterThanOrEqualToConstant: size.width)
@@ -206,11 +226,20 @@ extension View {
         }
     }
     
+    /// Alternative size constraint
+    /// - Note: Set size's width or height to skipConstraint to skip
+    public func constrain(
+        minimumWidth width: CGFloat, height: CGFloat,
+        priority: LayoutPriority = 1000)
+    {
+        self.constrain(minimumSize: CGSize(width: width, height: height), priority: priority)
+    }
+    
     /// Set maximum size constraint
     /// - Note: Set size's width or height to skipConstraint to skip
-    public func constrainMaximumSize(
-        priority: LayoutPriority = 1000,
-        size: CGSize)
+    public func constrain(
+        maximumSize size: CGSize,
+        priority: LayoutPriority = 1000)
     {
         if size.width != skipConstraint {
             widthAnchor.constraint(lessThanOrEqualToConstant: size.width)
@@ -222,11 +251,20 @@ extension View {
         }
     }
     
+    /// Alternative size constraint
+    /// - Note: Set size's width or height to skipConstraint to skip
+    public func constrain(
+        maximumWidth width: CGFloat, height: CGFloat,
+        priority: LayoutPriority = 1000)
+    {
+        self.constrain(maximumSize: CGSize(width: width, height: height), priority: priority)
+    }
+    
     /// Set position
     /// - Note: Set location's x or y to skipConstraint to skip
-    public func constrainPosition(
-        priority: LayoutPriority = 1000,
-        position: CGPoint)
+    public func constrainView(
+        position: CGPoint,
+        priority: LayoutPriority = 1000)
     {
         guard let superview = superview else { Swift.print("no superview") ; return }
         if position.x != skipConstraint {
@@ -273,7 +311,7 @@ extension View {
 extension View {
     /// Aligns view to superview using layout attribute name.
     /// - note: positive inset offsets always point towards the interior of the superview
-    public func alignInSuperview(_ attribute: NSLayoutAttribute, inset: CGFloat = 0.0, priority: LayoutPriority = 1000) {
+    public func alignToSuperview(_ attribute: LayoutAttribute, inset: CGFloat = 0.0, priority: LayoutPriority = 1000) {
         guard let superview = superview else { return }
         let actualInset: CGFloat = [.left, .leading, .top].contains(attribute) ? -inset : inset
         let constraint = NSLayoutConstraint(item: superview, attribute: attribute, relatedBy: .equal, toItem: self, attribute: attribute, multiplier: 1.0, constant: actualInset)
@@ -294,18 +332,18 @@ extension View {
         let horizontalPosition = positionChars[position.index(after: position.startIndex)]
         
         switch verticalPosition {
-        case "t": alignInSuperview(.top, inset: insetv, priority: priority)
-        case "c": alignInSuperview(.centerY, inset: insetv, priority: priority)
-        case "b": alignInSuperview(.bottom, inset: insetv, priority: priority)
-        case "x": stretchToSuperview(priority: priority, h: false, v: true, inset: Int(insetv))
+        case "t": alignToSuperview(.top, inset: insetv, priority: priority)
+        case "c": alignToSuperview(.centerY, inset: insetv, priority: priority)
+        case "b": alignToSuperview(.bottom, inset: insetv, priority: priority)
+        case "x": stretchView(h: false, v: true, inset: Int(insetv), priority: priority)
         default: break
         }
         
         switch horizontalPosition {
-        case "l": alignInSuperview(.leading, inset: inseth, priority: priority)
-        case "c": alignInSuperview(.centerX, inset: inseth, priority: priority)
-        case "r": alignInSuperview(.trailing, inset: inseth, priority: priority)
-        case "x": stretchToSuperview(priority: priority, h: true, v: false, inset: Int(inseth))
+        case "l": alignToSuperview(.leading, inset: inseth, priority: priority)
+        case "c": alignToSuperview(.centerX, inset: inseth, priority: priority)
+        case "r": alignToSuperview(.trailing, inset: inseth, priority: priority)
+        case "x": stretchView(h: true, v: false, inset: Int(inseth),  priority: priority)
         default: break
         }
     }

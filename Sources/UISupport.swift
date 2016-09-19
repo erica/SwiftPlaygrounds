@@ -10,6 +10,15 @@ extension PlaygroundPage {
 
 #if !os(OSX)
     public extension UIView {
+        /// Builds a view for easy playground construction.
+        /// - parameter w: view width
+        /// - parameter h: view height
+        /// - parameter position: view's origin point
+        /// - parameter backgroundColor: background color as UIColor
+        /// - parameter translucency: background alpha as CGFloat
+        /// - parameter borderWidth: layer border width in points
+        /// - parameter borderColor: layer border color as UIColor
+        /// - parameter cornerRadius: layer corner radius as CGFloat
         public convenience init(
             _ w: CGFloat,
             _ h: CGFloat,

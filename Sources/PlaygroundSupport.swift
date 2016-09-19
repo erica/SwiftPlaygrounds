@@ -1,32 +1,35 @@
 import Foundation
 import PlaygroundSupport
 
+/// Convenience
+public let fileManager = FileManager.default
+
 /// Controls and informs the playground's state
 public enum PlaygroundState {
     /// Shared data folder, typically ~/Shared\ Playground\ Data
-    public static var sharedDataURL = PlaygroundSupport.playgroundSharedDataDirectory
+    public static var sharedDataURL = playgroundSharedDataDirectory
     
     /// Returns the `PlaygroundPage` instance representing the current page in the playground.
-    static var page: PlaygroundPage {
+    public static var page: PlaygroundPage {
         return PlaygroundSupport.PlaygroundPage.current
     }
     
     /// Indicates whether the playground page needs to execute indefinitely.
     /// The default value of this property is `false`, but playground pages with live views will automatically set this to `true`.
-    static var runsForever: Bool {
+    public static var runsForever: Bool {
         get { return page.needsIndefiniteExecution }
         set { page.needsIndefiniteExecution = newValue }
     }
     
     /// Establishes that the playground page needs to execute indefinitely
-    static func runForever() { page.needsIndefiniteExecution = true }
+    public static func runForever() { page.needsIndefiniteExecution = true }
     
     /// Instructs Xcode that the playground page has finished execution.
-    static func stop() { page.finishExecution() }
+    public static func stop() { page.finishExecution() }
     
     /// The live view currently being displayed by Xcode on behalf
     /// of the playground page, or nil if there is no live view.
-    static var liveView: PlaygroundLiveViewable? {
+    public static var liveView: PlaygroundLiveViewable? {
         get { return page.liveView }
         set { page.liveView = newValue }
     }
@@ -50,6 +53,17 @@ public enum PlaygroundState {
     /// The file name of the current playground
     public static var playgroundName: String {
     return processEnvironment["PLAYGROUND_NAME"] ?? "Playground"
+    }
+    
+    public static var myDocsFolder: URL
+    {
+    let folderURL = sharedDataURL.appendingPathComponent(playgroundName)
+    if !fileManager.fileExists(atPath: folderURL.path) {
+    do {
+    try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
+    } catch { print("Unable to establish folder at", folderURL) }
+    }
+    return folderURL
     }
     
     /// Simulator's device family
