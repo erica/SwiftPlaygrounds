@@ -321,7 +321,7 @@ extension View {
     
     /// Places view in (existing) superview using layout string.
     /// Use invalid char (e.g. "-" or "*") to skip constraint.
-    public func placeInSuperview(_ position: String, inseth: CGFloat = 0.0, insetv: CGFloat = 0.0, priority: LayoutPriority = 1000) {
+    public func placeInSuperview(_ position: String, offseth: CGFloat = 0.0, offsetv: CGFloat = 0.0, priority: LayoutPriority = 1000) {
         if position.characters.count != 2 {return}
         if superview == nil {return}
         
@@ -332,18 +332,18 @@ extension View {
         let horizontalPosition = positionChars[position.index(after: position.startIndex)]
         
         switch verticalPosition {
-        case "t": alignToSuperview(.top, inset: insetv, priority: priority)
-        case "c": alignToSuperview(.centerY, inset: insetv, priority: priority)
-        case "b": alignToSuperview(.bottom, inset: insetv, priority: priority)
-        case "x": stretchView(h: false, v: true, inset: Int(insetv), priority: priority)
+        case "t": alignToSuperview(.top, inset: offsetv, priority: priority)
+        case "c": alignToSuperview(.centerY, inset: offsetv, priority: priority)
+        case "b": alignToSuperview(.bottom, inset: offsetv, priority: priority)
+        case "x": stretchToSuperview(h: false, v: true, inset: Int(offsetv), priority: priority)
         default: break
         }
         
         switch horizontalPosition {
-        case "l": alignToSuperview(.leading, inset: inseth, priority: priority)
-        case "c": alignToSuperview(.centerX, inset: inseth, priority: priority)
-        case "r": alignToSuperview(.trailing, inset: inseth, priority: priority)
-        case "x": stretchView(h: true, v: false, inset: Int(inseth),  priority: priority)
+        case "l": alignToSuperview(.leading, inset: offseth, priority: priority)
+        case "c": alignToSuperview(.centerX, inset: offseth, priority: priority)
+        case "r": alignToSuperview(.trailing, inset: offseth, priority: priority)
+        case "x": stretchToSuperview(h: true, v: false, inset: Int(offseth),  priority: priority)
         default: break
         }
     }
@@ -351,9 +351,9 @@ extension View {
 
 #if !os(OSX)
     extension UIViewController {
-        public func place(_ view: View, _ position: String, inseth: CGFloat = 0.0, insetv: CGFloat = 0.0, priority: LayoutPriority = 1000) {
+        public func place(_ view: View, _ position: String, offseth: CGFloat = 0.0, offsetv: CGFloat = 0.0, priority: LayoutPriority = 1000) {
             self.view.addSubview(view)
-            view.placeInSuperview(position, inseth: inseth, insetv: insetv, priority: priority)
+            view.placeInSuperview(position, offseth: offseth, offsetv: offsetv, priority: priority)
         }
     }
 #endif
