@@ -6,8 +6,10 @@ public let fileManager = FileManager.default
 
 /// Controls and informs the playground's state
 public enum PlaygroundState {
+    #if !(arch(arm) || arch(arm64))
     /// Shared data folder, typically ~/Shared\ Playground\ Data
-    public static var sharedDataURL = playgroundSharedDataDirectory
+    public static var sharedDataURL = PlaygroundSupport.playgroundSharedDataDirectory
+    #endif
     
     /// Returns the `PlaygroundPage` instance representing the current page in the playground.
     public static var page: PlaygroundPage {
@@ -55,17 +57,6 @@ public enum PlaygroundState {
     return processEnvironment["PLAYGROUND_NAME"] ?? "Playground"
     }
     
-    public static var myDocsFolder: URL
-    {
-    let folderURL = sharedDataURL.appendingPathComponent(playgroundName)
-    if !fileManager.fileExists(atPath: folderURL.path) {
-    do {
-    try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
-    } catch { print("Unable to establish folder at", folderURL) }
-    }
-    return folderURL
-    }
-    
     /// Simulator's device family
     public static var deviceFamily: String {
     return processEnvironment["IPHONE_SIMULATOR_DEVICE"] ?? "Unknown Device Family"
@@ -97,6 +88,19 @@ public enum PlaygroundState {
     public static var logRoot: URL? {
     guard let path = processEnvironment["SIMULATOR_LOG_ROOT"] else { return nil }
     return URL(fileURLWithPath: path)
+    }
+    #endif
+    
+    #if !os(OSX) && !(arch(arm) || arch(arm64))
+    public static var myDocsFolder: URL
+    {
+    let folderURL = sharedDataURL.appendingPathComponent(playgroundName)
+    if !fileManager.fileExists(atPath: folderURL.path) {
+    do {
+    try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
+    } catch { print("Unable to establish folder at", folderURL) }
+    }
+    return folderURL
     }
     #endif
     
