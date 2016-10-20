@@ -94,13 +94,13 @@ public enum PlaygroundState {
     #if !os(OSX) && !(arch(arm) || arch(arm64))
     public static var myDocsFolder: URL
     {
-    let folderURL = sharedDataURL.appendingPathComponent(playgroundName)
-    if !fileManager.fileExists(atPath: folderURL.path) {
-    do {
-    try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
-    } catch { print("Unable to establish folder at", folderURL) }
-    }
-    return folderURL
+        let folderURL = sharedDataURL.appendingPathComponent(playgroundName)
+        if !fileManager.fileExists(atPath: folderURL.path) {
+            do {
+                try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
+            } catch { print("Unable to establish folder at", folderURL) }
+        }
+        return folderURL
     }
     #endif
     
