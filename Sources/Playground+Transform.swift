@@ -1,4 +1,12 @@
-import UIKit
+#if os(macOS)
+    import Cocoa
+    fileprivate typealias _Font = NSFont
+    fileprivate typealias _Color = NSColor
+#else
+    import UIKit
+    fileprivate typealias _Font = UIFont
+    fileprivate typealias _Color = UIColor
+#endif
 
 fileprivate let π = CGFloat(Double.pi)
 
@@ -121,23 +129,11 @@ extension CGAffineTransform {
                                   attributes: CGAffineTransform._attributes)
     }
     
-    /// Image version of description
-    public var imageRepresentation: UIImage {
-        let attributedString = attributedDescription
-        let format = UIGraphicsImageRendererFormat(); format.scale = 1.0
-        let renderer = UIGraphicsImageRenderer(size: attributedString.size(), format: format)
-        return renderer.image { context in
-            let bounds = context.format.bounds
-            UIColor.white.set(); UIRectFill(bounds)
-            attributedString.draw(in: bounds)
-        }
-    }
-    
     // A shared set of rendering attributes
     // Other possible faces: CourierNewPSMT, Courier
     private static var _attributes: [String: Any] = [
-        NSFontAttributeName: UIFont(name: "Menlo-Regular", size: 10)!,
-        NSForegroundColorAttributeName: UIColor.black
+        NSFontAttributeName: _Font(name: "Menlo-Regular", size: 10)!,
+        NSForegroundColorAttributeName: _Color.black
     ]
 }
 
