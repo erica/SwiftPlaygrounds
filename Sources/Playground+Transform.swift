@@ -63,7 +63,7 @@ extension CGAffineTransform {
 extension CGAffineTransform: CustomStringConvertible {
     public var description: String {
         // Default padding
-        let (lpad, rpad, space) = (3, 3, " ")
+        let (lpad, rpad, space) = (5, 3, " ")
         
         // Blanks between left and right pipes
         let blank = String(repeatElement(" ", count: (lpad + rpad + 1) * 3 +
@@ -96,11 +96,11 @@ extension CGAffineTransform: CustomStringConvertible {
         result += " scale:       (" + pad2(_xScale)
             + ", " + pad2(_yScale) + ")\n"
         result += matrixLine(c, d, 0)
-        result += " rotation:    \(pad1(_degrees))°\n"
+        result += " rotation:    \(pad2(_degrees))°\n"
         result += blankline
-        result += " rotation:    \(pad1(_rotation / π)) π\n"
+        result += " rotation:    \(pad2(_rotation / π)) π\n"
         result += matrixLine(tx, ty, 1)
-        result += " rotation:    \(pad1(_rotation)) radians\n"
+        result += " rotation:    \(pad2(_rotation)) radians\n"
         result += "└" + blank + "┘"
         return result
     }
