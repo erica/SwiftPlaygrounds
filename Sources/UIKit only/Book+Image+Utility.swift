@@ -22,7 +22,9 @@ import UIKit
             let renderer = UIGraphicsImageRenderer(size: size, format: format)
             return renderer.image { context in actions(context) }
         }
-        
+    }
+    
+    extension UIImage {
         
         /// Draws to an image
         public static func illustrate(

@@ -132,7 +132,7 @@ extension CGAffineTransform {
     // A shared set of rendering attributes
     // Other possible faces: CourierNewPSMT, Courier
     private static var _attributes: [String: Any] = [
-        NSFontAttributeName: _Font(name: "Menlo-Regular", size: 10)!,
+        NSFontAttributeName: _Font(name: "Menlo-Regular", size: 9)!,
         NSForegroundColorAttributeName: _Color.black
     ]
 }

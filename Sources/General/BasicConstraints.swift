@@ -20,7 +20,7 @@
 public typealias LayoutAttribute = NSLayoutAttribute
 
 public let defaultLayoutOptions: NSLayoutFormatOptions = []
-public let skipConstraint = CGRect.null.origin.x
+public let skipConstraint = CGFloat.infinity
 
 public extension NSLayoutConstraint {
     /// Activates and prioritizes in one step
